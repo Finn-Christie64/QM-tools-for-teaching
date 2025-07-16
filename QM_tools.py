@@ -20,7 +20,7 @@ Name_1 = np.array([])
 
 # Token Test: This is used to ask the user what system they want to see
 def Token_test():
-    global state, Name_1, x, dx, Token, word
+    global state, Name_1, x_1, dx, Token, word
 
     print('The following commands will dictate what type of potential the system will be affected by')
     print('Input 1, for a Harmonic Oscillator')
@@ -39,40 +39,40 @@ def Token_test():
     match Token:
         case 1:
             Name_1 = np.append(Name_1, 'harmonic oscillator')
-            x = np.linspace(-15, 15, Nx)
+            x_1 = np.linspace(-15, 15, Nx)
         
         case 2:
             Name_1 = np.append(Name_1, 'infinite well')
-            x = np.linspace(-1, 2, Nx)
+            x_1 = np.linspace(-1, 2, Nx)
         
         case 3:
             Name_1 = np.append(Name_1, 'potential step')
-            x = np.linspace(-5, 5, Nx)
+            x_1 = np.linspace(-5, 5, Nx)
         
         case 4:
             Name_1 = np.append(Name_1, 'half Harmonic oscillator (V(x<0) = ∞)')
-            x = np.linspace(-5, 5, Nx)
+            x_1 = np.linspace(-5, 5, Nx)
 
         case 5:
             Name_1 = np.append(Name_1, 'dirac delta potential')
-            x = np.linspace(-5, 5, Nx)
+            x_1 = np.linspace(-5, 5, Nx)
             print('State will be in the ground state')
             state = 0
         case 6:
             Name_1 = np.append(Name_1, 'fourth degree \n harmonic oscillator') 
-            x = np.linspace(-15, 15, Nx)
+            x_1 = np.linspace(-15, 15, Nx)
         
         case 7:
             Name_1 = np.append(Name_1, '\n a line') 
-            x = np.linspace(-15, 15, Nx)
+            x_1 = np.linspace(-15, 15, Nx)
         
         case 8:
             Name_1 = np.append(Name_1, 'gaussian')
-            x = np.linspace(-25, 25, Nx)
+            x_1 = np.linspace(-25, 25, Nx)
             
         case 9:
             Name_1 = np.append(Name_1, '1/x')
-            x = np.linspace(-15, 15, Nx)
+            x_1 = np.linspace(-15, 15, Nx)
 
         case _:
             print('Bad token')
@@ -102,7 +102,7 @@ def Token_test():
         case _:
             word = f' for the {state}th excited state of {Name_1}'
 
-    dx = x[1] - x[0]
+    dx = x_1[1] - x_1[0]
 
 
 '''
@@ -149,11 +149,11 @@ def V(x):
     return V_1(x, Token)
 
 def pot():
-    global H, psi_x, E, e_vals, e_vecs
+    global H, psi_x, E_1, e_vals, e_vecs
 
     # Hamiltonian
     kinetic = diags([1, -2, 1], offsets=[-1, 0, 1], shape=(Nx, Nx)).toarray() / dx**2
-    potential = np.diag(V(x))
+    potential = np.diag(V(x_1))
     H = -kinetic/2 + potential  # Assuming ħ = m = 1
     
     # eig vals and vectors
@@ -169,7 +169,7 @@ def pot():
         case 6:
             psi_x = psi_x[::-1]
 
-    E = e_vals[state]
+    E_1 = e_vals[state]
     '''
     Plots for both V and psi plus V and |psi|**2
     '''
@@ -178,18 +178,18 @@ def pot():
 
     plt.subplot(1, 2, 1)
     plt.title(r'$V(x)$', fontsize=16)
-    plt.plot(x, V(x), label=r'$V(x)$', color='blue')
+    plt.plot(x_1, V(x_1), label=r'$V(x)$', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
     plt.ylabel(r'V(x)', fontsize=24)
     plt.ylim(-25, 25)
-    plt.xlim(np.min(x), np.max(x))
+    plt.xlim(np.min(x_1), np.max(x_1))
 
     plt.subplot(1, 2, 2)
     plt.title(r'$\psi(x,0)$' + word, fontsize=16)
-    plt.plot(x, psi_x.real, label=r'$\psi(x)$', color='blue')
+    plt.plot(x_1, psi_x.real, label=r'$\psi(x)$', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$\psi(x)$', fontsize=24)
     plt.grid(True)
@@ -202,17 +202,17 @@ def pot():
 
     plt.subplot(1, 2, 1)
     plt.title(r'$V(x)$', fontsize=16)
-    plt.plot(x, V(x), label=r'$V(x)$', color='blue')
+    plt.plot(x_1, V(x_1), label=r'$V(x)$', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$V(x)$', fontsize=24)
     plt.grid(True)
     plt.ylim(-25, 25)
-    plt.xlim(np.min(x), np.max(x))
+    plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
 
     plt.subplot(1, 2, 2)
     plt.title(r'$|\psi(x,t)|^2$' + word, fontsize=32)
-    plt.plot(x, np.abs(psi_x)**2, label='Probability Density', color='blue')
+    plt.plot(x_1, np.abs(psi_x)**2, label='Probability Density', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$|\psi(x,t)|^2$', fontsize=24)
     plt.grid(True)
@@ -226,7 +226,7 @@ def pot():
     # Plot the real part of the wavefunction
     plt.figure(figsize=(12, 5))
     plt.title(r'$\psi(x,0)$' + word, fontsize=32)
-    plt.plot(x, psi_x.real, label=r'$\psi(x)$', color='blue')
+    plt.plot(x_1, psi_x.real, label=r'$\psi(x)$', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$\psi(x)$', fontsize=24)
     plt.grid(True)
@@ -237,7 +237,7 @@ def pot():
     # Plot the probability density
     plt.figure(figsize=(12, 5))
     plt.title(r'$|\psi(x,t)|^2$' + word, fontsize=32)
-    plt.plot(x, np.abs(psi_x)**2, label='Probability Density', color='blue')
+    plt.plot(x_1, np.abs(psi_x)**2, label='Probability Density', color='blue')
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$|\psi(x,t)|^2$', fontsize=24)
     plt.grid(True)
@@ -264,7 +264,7 @@ def animate_wavefunction():
     line_re, = ax.plot([], [], lw=2, label=r'Re[$\psi(x,t)$]', color='blue')
     line_im, = ax.plot([], [], lw=2, linestyle='--', label=r'Im[$\psi(x,t)$]', color='red')
 
-    ax.set_xlim(x[0], x[-1])
+    ax.set_xlim(x_1[0], x_1[-1])
     ax.set_ylim(-1.2 * np.max(np.abs(psi_x)), 1.2 * np.max(np.abs(psi_x)))
     ax.set_xlabel("x", fontsize=24)
     ax.set_ylabel(r"$\psi(x,t)$", fontsize=24)
@@ -278,9 +278,9 @@ def animate_wavefunction():
         return line_re, line_im
 
     def update(frame):
-        psi_t = psi_x * np.exp(-1j * E * t[frame])
-        line_re.set_data(x, psi_t.imag)
-        line_im.set_data(x, psi_t.real)
+        psi_t = psi_x * np.exp(-1j * E_1 * t[frame])
+        line_re.set_data(x_1, psi_t.imag)
+        line_im.set_data(x_1, psi_t.real)
         return line_re, line_im
 
     ani = FuncAnimation(fig, update, frames=np.arange(0, len(t), 10),init_func=init, blit=True, interval = 7.5)
@@ -303,12 +303,11 @@ WKB methods is done as follows:
 Dictionary
 """
 # Symbol definitions (do NOT remove)
-h, n, π, w, m, x, E, u, x0, ℏ, L, A = sp.symbols('h n π w m x E u x0 ℏ L A', real=True, positive=True)
+h, n, π, w, m, x, E, u, x0, ℏ, L, A, V_0, x = sp.symbols('h n π w m x E u x0 ℏ L A V_0 x', real=True, positive=True)
 
 # Dictionary used for expression parsing
 DICT = {
-    'h': h, 'n': n, 'π': π, 'w': w, 'm': m, 'x': x, 'E': E,
-    'u': u, 'x0': x0, 'ℏ': ℏ, 'L': L, 'A': A
+    'h': h, 'n': n, 'π': π, 'w': w, 'm': m, 'x': x, 'E': E, 'u': u, 'x0': x0, 'ℏ': ℏ, 'L': L, 'A': A, 'V_0': V_0
 }
 transformations = standard_transformations
 
@@ -365,17 +364,25 @@ def WKB():
     # Quantization condition RHS
     Con = π * ℏ / 2 if wave_type == 'cos' else π * ℏ
     RHS = Con * (n - soft / 4)
+
     print('\nRHS (Quantization condition):')
     sp.pprint(RHS)
     
-    sp.pprint(f'The main intergal is {sp.sqrt(2*m*(E - V_0))} \n how the computer will interpect the prior intergal is as follows {sp.sqrt(2*m*E) * sp.sqrt(1 - V_0/E)}' )
+    main_expr = sp.sqrt(2 * m * (E - V_0))
+    comp_expr = sp.sqrt(2 * m * E) * sp.sqrt(1 - V_0 / E)
+    print("\nThe main integral is:")
+    sp.pprint(main_expr)
+
+    print("\nHow the computer might interpret the integral is as:")
+    sp.pprint(comp_expr)
+
     Intergrad = sp.sqrt(1 - V_0/E)
 
-    a = get_expr('Lower bound test(just pick a set of points that mimic the upper and lower bounds, or plug in the upper and lower bounds) ')
+    a = get_expr('Lower bound: ')
     if a is None: 
         return
 
-    b = get_expr('Upper bound test: ')
+    b = get_expr('Upper bound: ')
     if b is None: 
         return
 
@@ -394,11 +401,11 @@ def WKB():
             if const_expr is None: 
                 return
             
-            a = get_expr('Lower bound: ')
+            a = get_expr('Lower bound test(just pick a set of points that mimic the upper and lower bounds, or plug in the upper and lower bounds): ')
             if a is None: 
                 return
 
-            b = get_expr('Upper bound: ')
+            b = get_expr('Upper bound test: ')
             if b is None: 
                 return
             
@@ -426,8 +433,8 @@ def WKB():
                 subs_dict.update({h: 1, m: 1, w: 1, ℏ: 1, π: 1, L: 1})
             return E_input.subs(subs_dict)
         
-        for i in range(1,7):
-            print(f'\nE(n={i}) = {E_func(i)}')
+        print(f'\nE(n=1): {E_func(1)}')
+        print(f'\nE(n=2): {E_func(2)}')
 
     def E_func(n_val):
         subs_dict = {n: n_val, h: 1, m: 1, w: 1, ℏ: 1, π: 1, L: 1}
