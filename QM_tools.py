@@ -195,7 +195,7 @@ def pot():
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
     # Plot V(x) |psi|^2
     plt.figure(figsize=(12, 5))
@@ -218,7 +218,7 @@ def pot():
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
     '''
     No subplots
@@ -232,7 +232,7 @@ def pot():
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
     # Plot the probability density
     plt.figure(figsize=(12, 5))
@@ -243,7 +243,7 @@ def pot():
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
     # Print normalization (should be close to 1 for a normalized wavefunction)
     print(f"Normalization: {np.sum(np.abs(psi_x)**2)}")
@@ -286,7 +286,7 @@ def animate_wavefunction():
     ani = FuncAnimation(fig, update, frames=np.arange(0, len(t), 10),init_func=init, blit=True, interval = 7.5)
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
 
 """
@@ -378,11 +378,11 @@ def WKB():
 
     Intergrad = sp.sqrt(1 - V_0/E)
 
-    a = get_expr('Lower bound: ')
+    a = get_expr('Lower bound test (just pick a set of points that mimic the upper and lower bounds, or plug in the upper and lower bounds): ')
     if a is None: 
         return
 
-    b = get_expr('Upper bound: ')
+    b = get_expr('Upper bound (same rule as above): ')
     if b is None: 
         return
 
@@ -401,7 +401,7 @@ def WKB():
             if const_expr is None: 
                 return
             
-            a = get_expr('Lower bound test(just pick a set of points that mimic the upper and lower bounds, or plug in the upper and lower bounds): ')
+            a = get_expr('Lower bound test: ')
             if a is None: 
                 return
 
@@ -421,7 +421,8 @@ def WKB():
 
     # Optional: Ask user to input a closed-form for E
     E_input = get_expr("After solving for E, input your expression for E in terms of h (not ℏ), n, etc: ")
-    n_vals = np.arange(1, 6)
+    n_vals = np.arange(0, 6)
+    dn_vals = np.linspace(1,6,1000)
 
     if E_input:
         print("You entered:")
@@ -433,8 +434,9 @@ def WKB():
                 subs_dict.update({h: 1, m: 1, w: 1, ℏ: 1, π: 1, L: 1})
             return E_input.subs(subs_dict)
         
-        print(f'\nE(n=1): {E_func(1)}')
-        print(f'\nE(n=2): {E_func(2)}')
+        print('The fowlloing are the first six energy states ')
+        for i in range(0,7):
+            print(f'\nE(n={i}): {E_func(i)}')
 
     def E_func(n_val):
         subs_dict = {n: n_val, h: 1, m: 1, w: 1, ℏ: 1, π: 1, L: 1}
