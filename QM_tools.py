@@ -22,17 +22,17 @@ Name_1 = np.array([])
 def Token_test():
     global state, Name_1, x_1, dx, Token, word
 
-    print('The following commands will dictate what type of potential the system will be affected by')
-    print('Input 1, for a Harmonic Oscillator')
-    print('Input 2, for an Infinite Well')
-    print('Input 3, for a Potential Step')
-    print('Input 4, for a Half Harmonic Oscillator')
-    print('Input 5, for a Dirac delta potential')
-    print('Input 6, for Harmonic Oscillator with the addtion of -Ax^4')
-    print('Input 7, for a Line')
-    print('Input 8, for a Gaussian')
-    print('Input 9, for 1/x')
-    print('Input 10, input any potential')
+    print('The following commands will dictate what type of potential the system will be affected by\n')
+    print('Input 1, for a Harmonic Oscillator\n')
+    print('Input 2, for an Infinite Well\n')
+    print('Input 3, for a Potential Step\n')
+    print('Input 4, for a Half Harmonic Oscillator\n')
+    print('Input 5, for a Dirac delta potential\n')
+    print('Input 6, for 10*x - 0.5 * x**2 + x**3 + 0.5 * x**4 \nie fourth degree harmonic oscillator\n')
+    print('Input 7, for a Line\n')
+    print('Input 8, for a Gaussian\n')
+    print('Input 9, for 1/x\n')
+    print('Input 10, input any potential\n')
 
     Token = int(input())
 
@@ -73,6 +73,12 @@ def Token_test():
         case 9:
             Name_1 = np.append(Name_1, '1/x')
             x_1 = np.linspace(-15, 15, Nx)
+        
+        case 10:
+            print('Not available as of this time, token will be set to 1')
+            Token = 1
+            Name_1 = np.append(Name_1, 'harmonic oscillator')
+            x_1 = np.linspace(-15, 15, Nx)
 
         case _:
             print('Bad token')
@@ -106,7 +112,7 @@ def Token_test():
 
 
 '''
-Setting up H withtThe steps of this is as follows:
+Setting up H witht The steps of this is as follows:
 1) Define the potentials of the system.
 2) Construct the Hamiltonian as an N by N matrix.
 3) Find the eigenvalues and eigenvectors, which are used for the time evolution and psi graphs, respectively.
@@ -133,7 +139,7 @@ def V_1(x, token):
             return np.where(x != 0, 0, -10**5)  # Dirac delta    
 
         case 6:
-            return np.where(np.abs(x) <= scal, 10*x - 0.5 * x**2 + x**3 + 0.5 * x**4, 10**5) # x^4 Potential
+            return np.where(np.abs(x) <= 5, 10*x - 0.5 * x**2 + x**3 + 0.5 * x**4, 0) # x^4 Potential
 
         case 7: 
             return np.where((x >= 0) & (x <= 7), x - 7, 0) # Line  
@@ -162,7 +168,7 @@ def pot():
     psi_x = e_vecs[:, state]
     
     match Token:
-        case 1:
+        case 1 | 10:
             psi_x = psi_x[::-1]
         case 2:
             psi_x = -1*psi_x
@@ -184,7 +190,7 @@ def pot():
     plt.legend()
     plt.tight_layout()
     plt.ylabel(r'V(x)', fontsize=24)
-    plt.ylim(-25, 25)
+    plt.ylim(np.min(V(x_1)), np.max(V(x_1)))
     plt.xlim(np.min(x_1), np.max(x_1))
 
     plt.subplot(1, 2, 2)
@@ -206,7 +212,7 @@ def pot():
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$V(x)$', fontsize=24)
     plt.grid(True)
-    plt.ylim(-25, 25)
+    plt.ylim(np.min(V(x_1)), np.max(V(x_1)))
     plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
 
@@ -286,7 +292,7 @@ def animate_wavefunction():
     ani = FuncAnimation(fig, update, frames=np.arange(0, len(t), 10),init_func=init, blit=True, interval = 7.5)
 
     plt.tight_layout()
-    plt.show(block=False)
+    plt.show(block=True)
 
 
 """
@@ -303,11 +309,11 @@ WKB methods is done as follows:
 Dictionary
 """
 # Symbol definitions (do NOT remove)
-h, n, π, w, m, x, E, u, x0, ℏ, L, A, V_0, x = sp.symbols('h n π w m x E u x0 ℏ L A V_0 x', real=True, positive=True)
+h, n, π, w, m, x, E, u, x0, ℏ, L, A, V_0, x, p = sp.symbols('h n π w m x E u x0 ℏ L A V_0 x p', real=True, positive=True)
 
 # Dictionary used for expression parsing
 DICT = {
-    'h': h, 'n': n, 'π': π, 'w': w, 'm': m, 'x': x, 'E': E, 'u': u, 'x0': x0, 'ℏ': ℏ, 'L': L, 'A': A, 'V_0': V_0
+    'h': h, 'n': n, 'π': π, 'w': w, 'm': m, 'x': x, 'E': E, 'u': u, 'x0': x0, 'ℏ': ℏ, 'L': L, 'A': A, 'V_0': V_0, 'p':p
 }
 transformations = standard_transformations
 
@@ -329,11 +335,8 @@ def WKB():
         case 2:
             V_0 = 0
 
-        case 3:
-            V_0 = sp.Piecewise((0, x <= 0), (10, x > 0))
-
-        case 6:
-            V_0 = 1/2 * m * w**2 * x**2 + A*x**4
+        case 7:
+            V_0 = x - 7
 
         case _:
             print("Invalid token or as yet to be added to the WKB part of this program")
