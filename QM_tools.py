@@ -371,11 +371,11 @@ def WKB():
     sp.pprint(f'The main intergal is {sp.sqrt(2*m*(E - V_0))} \n how the computer will interpect the prior intergal is as follows {sp.sqrt(2*m*E) * sp.sqrt(1 - V_0/E)}' )
     Intergrad = sp.sqrt(1 - V_0/E)
 
-    a = get_expr('Lower bound: ')
+    a = get_expr('Lower bound test(just pick a set of points that mimic the upper and lower bounds, or plug in the upper and lower bounds) ')
     if a is None: 
         return
 
-    b = get_expr('Upper bound: ')
+    b = get_expr('Upper bound test: ')
     if b is None: 
         return
 
