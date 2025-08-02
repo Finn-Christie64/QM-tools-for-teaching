@@ -11,7 +11,7 @@ Variables and symbols
 '''
 
 # Variables
-Nx = 2000 # number of points for the x-axis
+Nx = 1000 # number of points for the x-axis
 Nt = 5000 # number of points for time evolution
 t = np.linspace(0, 10, Nt)
 scal = 10
@@ -32,7 +32,6 @@ def Token_test():
     print('Input 7, for a Line\n')
     print('Input 8, for a Gaussian\n')
     print('Input 9, for 1/x\n')
-    print('Input 10, input any potential\n')
 
     Token = int(input())
 
@@ -55,7 +54,7 @@ def Token_test():
 
         case 5:
             Name_1 = np.append(Name_1, 'dirac delta potential')
-            x_1 = np.linspace(-5, 5, Nx)
+            x_1 = np.linspace(-10, 10, Nx)
             print('State will be in the ground state')
             state = 0
         case 6:
@@ -124,7 +123,7 @@ def V_1(x, token):
 
     match Token:
         case 1:
-            return np.where(np.abs(x) <= scal, 0.5 * x**2, 0.5 * scal**2)  # Harmonic oscillator
+            return 0.5 * x**2  # Harmonic oscillator
         
         case 2:
             return np.where((x < 1) & (x > 0), 0, 10**5)  # Inf well
@@ -136,10 +135,10 @@ def V_1(x, token):
             return np.where(x > 0, 0.5 * x**2, 10**5)  # Half Harmonic oscillator
         
         case 5:
-            return np.where(x != 0, 0, -10**5)  # Dirac delta    
+            return np.where(x != 0, 0, 10**5)  # Dirac delta    
 
         case 6:
-            return np.where(np.abs(x) <= 5, 10*x - 0.5 * x**2 + x**3 + 0.5 * x**4, 0) # x^4 Potential
+            return 10*x - 0.5 * x**2 + x**3 + 0.5 * x**4 # x^4 Potential
 
         case 7: 
             return np.where((x >= 0) & (x <= 7), x - 7, 0) # Line  
@@ -199,6 +198,7 @@ def pot():
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$\psi(x)$', fontsize=24)
     plt.grid(True)
+    plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
     plt.tight_layout()
     plt.show(block=False)
@@ -222,6 +222,7 @@ def pot():
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$|\psi(x,t)|^2$', fontsize=24)
     plt.grid(True)
+    plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
     plt.tight_layout()
     plt.show(block=False)
@@ -236,6 +237,7 @@ def pot():
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$\psi(x)$', fontsize=24)
     plt.grid(True)
+    plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
     plt.tight_layout()
     plt.show(block=False)
@@ -247,14 +249,26 @@ def pot():
     plt.xlabel('x', fontsize=24)
     plt.ylabel(r'$|\psi(x,t)|^2$', fontsize=24)
     plt.grid(True)
+    plt.xlim(np.min(x_1), np.max(x_1))
     plt.legend()
     plt.tight_layout()
-    plt.show(block=False)
+    plt.show(block=True)
 
     # Print normalization (should be close to 1 for a normalized wavefunction)
     print(f"Normalization: {np.sum(np.abs(psi_x)**2)}")
 
+def energy_plot():
+    e_vals_10 = np.array([e_vals[i] for i in range(10)])
 
+    plt.figure(figsize=(12, 5))
+    plt.title(r'First 10 energy states of a' + Name_1, fontsize=32)
+    plt.xlabel(f'States', fontsize=24)
+    plt.ylabel(r'E', fontsize=24)
+    plt.grid(True)
+    plt.tight_layout()
+    for i in range(10):
+        plt.scatter(i,e_vals_10[i],color = 'red')
+    plt.show(block=False)
 
 '''
 Time evolution figure
@@ -293,7 +307,6 @@ def animate_wavefunction():
 
     plt.tight_layout()
     plt.show(block=True)
-
 
 """
 WKB methods is done as follows:
@@ -424,8 +437,8 @@ def WKB():
 
     # Optional: Ask user to input a closed-form for E
     E_input = get_expr("After solving for E, input your expression for E in terms of h (not ℏ), n, etc: ")
+    E_val_0 = np.array([e_vals[i] for i in range(0,6)])
     n_vals = np.arange(0, 6)
-    dn_vals = np.linspace(1,6,1000)
 
     if E_input:
         print("You entered:")
@@ -454,6 +467,7 @@ def WKB():
     plt.figure(figsize=(8, 5))
     plt.title(r'Energy as a function of its state of a unit-less ' + Name_1, fontsize=24)
     plt.scatter(n_vals, E_vals, label='Energy', color='purple')
+    
     plt.xlabel('n', fontsize=18)
     plt.ylabel(r'$E(n)$', fontsize=18)
     plt.legend()
@@ -463,5 +477,6 @@ def WKB():
 
 Token_test() #Everything runs based on the Token test
 pot()
-animate_wavefunction()
-WKB()
+energy_plot()
+#animate_wavefunction()
+#WKB()
