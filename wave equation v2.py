@@ -213,11 +213,51 @@ def H():
     x_points = x_points[::-1]   # Need to flip the terms to maintain order
     psi_points = psi_points[::-1]
 
-def plot():
+'''
+The following functions are the momentum and momentum squared oprators
+'''
 
+def p_hat(psi):
+    d_dx = diags([-1/2, 0, 1/2], offsets=[-1, 0, 1], shape=(N + 1, N + 1)).toarray()
+
+    d_dx_0 = d_dx[0]
+    d_dx_0[0:3] = np.array([-3/2, 2, -1/2])
+    d_dx_f = d_dx[-1]
+    d_dx_f[N-2:N+1] = np.array([1/2, -2, 3/2])
+    d_dx /= h**2
+
+    return np.imag(np.matmul(d_dx, psi))
+
+def p_hat_2(psi):
+    d2_dx2 = diags([1, -2, 1], offsets=[-1, 0, 1], shape=(N + 1, N + 1)).toarray()
+
+    d2_dx2_0 = d2_dx2[0]
+    d2_dx2_0[0:4] = np.array([2, -5, 4, -1])
+    d2_dx2_f = d2_dx2[-1]
+    d2_dx2_f[N-3:N+1] = np.array([-1, 4, -5, 2])
+    d2_dx2 /= h**2
+
+    return -1 * np.matmul(d2_dx2, psi)
+
+def plot():
+    
+    '''
+    Prints <x>,<x**2>, <p>, <p**2>, and the Heisenberg's Uncertainty Principle
+    '''
+    
     print('\n')
     print('-'*30)
-    print(f'\n<\u03A8|\u03A8> = {np.sum(psi_points.T * psi_points):.2f}\n<x> = {np.sum(psi_points.T * x_points * psi_points):.2f}\n<x**2> = {np.sum(psi_points.T * (x_points)**2 * psi_points):.2f}')
+    print(f'\n<\u03A8|\u03A8> = {np.sum(psi_points.T * psi_points):.2f}\n<x> = {np.sum(psi_points.T * x_points * psi_points):.2f}\n<x**2> = {np.sum(psi_points.T * (x_points)**2 * psi_points):.2f}\n<p> = {np.sum(psi_points.T * p_hat(psi_points))}\n<p**2> = {np.sum(psi_points.T * p_hat_2(psi_points)):.2f}')
+    
+    #the next two lines of code are used to define sigma values of x and p
+    sigma_x = np.sqrt(np.sum(psi_points.T * (x_points)**2 * psi_points) - np.sum(psi_points.T * x_points * psi_points)**2)
+    sigma_p = np.sqrt(np.sum(psi_points.T * p_hat_2(psi_points)) - np.sum(psi_points.T * p_hat(psi_points))**2)
+    
+    print(f'Heisenberg\'s Uncertainty Principle: {(sigma_x * sigma_p):.2} ≥ 1/2')
+
+    '''
+    The rest of the lines in this fuction are uwed to plot, psi, psi,^2
+    '''
 
     plt.style.use('dark_background')
     plt.figure(figsize=(12, 8))
@@ -258,10 +298,19 @@ def plot():
     plt.show()
 
 def animate_wavefunction():
+
+    '''
+    The aim of this function is to show the Heisenberg picture of physics by adding a time evolution operator
+    '''
+
     global ani
 
+    #line spacing for time 
     t = np.linspace(0, 2 * np.pi / abs(E_1), 1000)
 
+    '''
+    Developing the plots
+    '''
     fig, ax = plt.subplots(figsize=(12, 8))
     line_re, = ax.plot([], [], lw=2, label='\u03A8', color='blue')
     line_im, = ax.plot([], [], lw=2, linestyle='--', label='\u03A8', color='red')
@@ -273,19 +322,28 @@ def animate_wavefunction():
     ax.set_title(f"{word}", fontsize=32)
     ax.legend()
 
+    '''
+    Setting up the real and imaginary data set 
+    '''
+
     def init():
         line_re.set_data([], [])
         line_im.set_data([], [])
         return line_re, line_im
 
-    def update(frame):
+    def update(frame): # This function addes to the aforementioned data sets
         psi_t = psi_points * np.exp(-1j * E_1 * t[frame])
         line_re.set_data(x_points, psi_t.imag)
         line_im.set_data(x_points, psi_t.real)
         return line_re, line_im
 
+    # The code below is an importated function that will animate the real and imaginary lines
     ani = FuncAnimation(fig, update, frames=np.arange(0, len(t), 10),init_func=init, blit=True, interval = 7.5)
     
+    '''
+    Fine tooning the plot
+    
+    '''
     plt.axhline(y=0, color='white', linewidth=1)
     plt.axvline(x=0, color='white', linewidth=1)   
     plt.tight_layout()
