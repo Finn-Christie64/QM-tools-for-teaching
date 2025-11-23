@@ -1,3 +1,8 @@
+""" 
+THE AUTHOR WOULD LIKE THE READER TO KNOW THAT THE CODE BELOW IS DOG SHIT! 
+IF THE READER WANT TO EITHER LOOK OR USE THIS PROJECT, THEN HE WOULD LIKE TO ASK THE READER TO LOOK AT "wave equation v2.py"
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import diags
