@@ -37,28 +37,28 @@ def Token_test():
     
     match Token:
         case 1:
-            Name_1 = np.append(Name_1, 'harmonic oscillator')
+            Name_1 = np.append(Name_1, 'a harmonic oscillator')
         
         case 2:
-            Name_1 = np.append(Name_1, 'infinite well')
+            Name_1 = np.append(Name_1, 'an infinite well')
         
         case 3:
-            Name_1 = np.append(Name_1, 'potential step')
+            Name_1 = np.append(Name_1, 'a potential step')
         
         case 4:
-            Name_1 = np.append(Name_1, 'half Harmonic oscillator (V(x<0) = ∞)')
+            Name_1 = np.append(Name_1, 'a half Harmonic oscillator (V(x<0) = ∞)')
+
         case 5:
-            Name_1 = np.append(Name_1, 'dirac delta potential')
-            print('State will be in the ground state')
-            state = 0
+            Name_1 = np.append(Name_1, 'a dirac delta potential')
+
         case 6:
-            Name_1 = np.append(Name_1, 'fourth degree \n harmonic oscillator') 
+            Name_1 = np.append(Name_1, 'a fourth degree \n harmonic oscillator') 
         
         case 7:
-            Name_1 = np.append(Name_1, '\n a line') 
+            Name_1 = np.append(Name_1, '\n a line potential') 
         
         case 8:
-            Name_1 = np.append(Name_1, 'gaussian')
+            Name_1 = np.append(Name_1, 'a gaussian')
             
         case 9:
             Name_1 = np.append(Name_1, '1/x')
@@ -70,9 +70,12 @@ def Token_test():
             print('Bad token')
             return  # early return if bad input
     
-    print('Input the state you wish the system to be in')
-
-    state = int(input())
+    if Token == 5:
+        print('State will be in the ground state')
+        state = 0
+    else:    
+        print('Input the state you wish the system to be in')
+        state = int(input())
     
     '''
     Grammer
@@ -95,7 +98,8 @@ def Token_test():
             word = f'The {state}th excited state of {Name_1[0]}'
 
 def V(x):
-    
+    global x_0, x_N, h
+
     '''
     The set of Potentials
     '''
@@ -105,6 +109,9 @@ def V(x):
             return 0.5 * (x) ** 2
         
         case 2:
+            x_0, x_N = -1, 2
+            h = (x_N - x_0)/N
+
             if x < 1 and x > 0:
                 return 0
             else:
@@ -120,13 +127,13 @@ def V(x):
             if x > 0:
                 return 0.5 * (x) ** 2
             else:
-                return 0
+                return 10**5
         
-        case 5:
+        case 5: # sill needs work
             if x != 0:
                 return 0
             else:
-                0
+                return 10**5
 
         case 6:
             return 10*(x) - 0.5 * (x)**2 + (x)**3 + 0.5 * (x)**4
@@ -135,16 +142,16 @@ def V(x):
             if x >= 0 and x <= 7:
                 return x - 7
             else:
-                0
+                return 0
 
         case 8:
             return math.exp(-math.pow(x,2)/25)
         
         case 9:
-            if x < 0 and abs(x) < h:
-                return -1/h
+            if x <= 0 and abs(x) < h:
+                return -1/h 
             elif x > 0 and abs(x) < h:
-                return 1/h
+                return 1/h 
             else:
                 return 1/x
             
@@ -152,7 +159,7 @@ def V(x):
             return 0
         
 def H():
-    global x_points, psi_points, E_1
+    global x_points, psi_points, E_1, e_vals, e_vecs
 
     i = 0 # set up
 
@@ -220,21 +227,19 @@ The following functions are the momentum and momentum squared oprators
 def p_hat(psi):
     d_dx = diags([-1/2, 0, 1/2], offsets=[-1, 0, 1], shape=(N + 1, N + 1)).toarray()
 
-    d_dx_0 = d_dx[0]
-    d_dx_0[0:3] = np.array([-3/2, 2, -1/2])
-    d_dx_f = d_dx[-1]
-    d_dx_f[N-2:N+1] = np.array([1/2, -2, 3/2])
-    d_dx /= h**2
+    d_dx[0, :3]  = np.array([-3/2, 2, -1/2])
+    d_dx[-1, -3:] = np.array([1/2, -2, 3/2])
 
-    return np.imag(np.matmul(d_dx, psi))
+    d_dx /= h
+
+    return -1j*(np.matmul(d_dx, psi))
 
 def p_hat_2(psi):
     d2_dx2 = diags([1, -2, 1], offsets=[-1, 0, 1], shape=(N + 1, N + 1)).toarray()
 
-    d2_dx2_0 = d2_dx2[0]
-    d2_dx2_0[0:4] = np.array([2, -5, 4, -1])
-    d2_dx2_f = d2_dx2[-1]
-    d2_dx2_f[N-3:N+1] = np.array([-1, 4, -5, 2])
+    d2_dx2[0, 0:4] = np.array([2, -5, 4, -1])
+    d2_dx2[-1, -4:] = np.array([-1, 4, -5, 2])
+
     d2_dx2 /= h**2
 
     return -1 * np.matmul(d2_dx2, psi)
@@ -251,12 +256,12 @@ def plot():
     
     #the next two lines of code are used to define sigma values of x and p
     sigma_x = np.sqrt(np.sum(psi_points.T * (x_points)**2 * psi_points) - np.sum(psi_points.T * x_points * psi_points)**2)
-    sigma_p = np.sqrt(np.sum(psi_points.T * p_hat_2(psi_points)) - np.sum(psi_points.T * p_hat(psi_points))**2)
+    sigma_p = np.sqrt(np.sum(psi_points.T * p_hat_2(psi_points)) - np.sum(np.abs(psi_points.T * p_hat(psi_points)))**2)
     
     print(f'Heisenberg\'s Uncertainty Principle: {(sigma_x * sigma_p):.2} ≥ 1/2')
 
     '''
-    The rest of the lines in this fuction are uwed to plot, psi, psi,^2
+    The following lines in this fuction are uwed to plot, psi, psi,^2
     '''
 
     plt.style.use('dark_background')
@@ -297,6 +302,27 @@ def plot():
     plt.grid()
     plt.show()
 
+    '''
+    The next set of lines are used to plot the first 10 enegry states
+    '''
+
+    if Token != 5: # There is no need to show ay other states 
+        Ene = np.array([e_vals[i] for i in range(10)])
+        data_set = np.arange(0,10)
+    
+        plt.style.use('dark_background')
+        plt.figure(figsize=(12, 8))
+        plt.tight_layout()
+        plt.scatter(data_set, Ene)
+        plt.title(f'Energy states of {word}', fontsize = 26)
+        plt.ylabel('E', rotation = 360, fontsize=20)
+        plt.xlabel('states', fontsize = 20)
+        plt.axhline(y=0, color='white', linewidth=1)
+        plt.axvline(x=0, color='white', linewidth=1)      
+        plt.show()
+
+
+
 def animate_wavefunction():
 
     '''
@@ -312,13 +338,13 @@ def animate_wavefunction():
     Developing the plots
     '''
     fig, ax = plt.subplots(figsize=(12, 8))
-    line_re, = ax.plot([], [], lw=2, label='\u03A8', color='blue')
-    line_im, = ax.plot([], [], lw=2, linestyle='--', label='\u03A8', color='red')
+    line_re, = ax.plot([], [], lw=2, label='real', color='blue')
+    line_im, = ax.plot([], [], lw=2, linestyle='--', label='imaginary', color='red')
 
-    ax.set_xlim(x_points[0], x_points[-1])
+    ax.set_xlim(x_0, x_N)
     ax.set_ylim(-1.2 * np.max(np.abs(psi_points)), 1.2 * np.max(np.abs(psi_points)))
     ax.set_xlabel("x", fontsize=24)
-    ax.set_ylabel('|\u03A8|^2         ', rotation = 360, fontsize=24)
+    ax.set_ylabel('\u03A8   ', rotation = 360, fontsize=24)
     ax.set_title(f"{word}", fontsize=32)
     ax.legend()
 
@@ -347,6 +373,8 @@ def animate_wavefunction():
     plt.axhline(y=0, color='white', linewidth=1)
     plt.axvline(x=0, color='white', linewidth=1)   
     plt.tight_layout()
+    plt.xticks([])
+    plt.yticks([])
     plt.style.use('dark_background')
     plt.show()
 
