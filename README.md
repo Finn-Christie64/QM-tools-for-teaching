@@ -1,6 +1,6 @@
 # QM-tools-for-teaching
 
-THE AUTHOR WOULD LIKE THE READER TO KNOW THAT THE "QM_tools.py" IS DOG SHIT! IF THE READER WANT TO EITHER LOOK OR USE THIS PROJECT, THEN HE WOULD LIKE TO ASK THE READER TO LOOK AT "wave equation v2.py"
+THE AUTHOR WOULD LIKE THE READER TO KNOW THAT "QM_tools.py" IS DOG SHIT! IF THE READER WANT TO EITHER LOOK OR USE THIS PROJECT, THE THE AUTHOR WOULD LIKE TO ASK THE READER TO LOOK AT "wave equation v2.py"
 
 If anyone finds themself stuck, have ideas on what I should add, or anything in between, email finn.christie282@mucsuci.edu 
 
